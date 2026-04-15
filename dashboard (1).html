@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Prevenção de Perdas · Shopee</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --accent:     #EE4D2D;
+  --accent-dk:  #C73E24;
+  --accent-lt:  #FFEEE9;
+  --accent2:    #FF7337;
+  --orange-mid: #FF9A6C;
+  --bg:         #F7F3F0;
+  --surface:    #FFFFFF;
+  --surface2:   #FFF6F0;
+  --border:     #EDE0D9;
+  --text:       #1A1009;
+  --text2:      #6B5347;
+  --text3:      #A8938A;
+  --ok:         #1AA563;
+  --ok-lt:      #E6F7EF;
+  --warn:       #F59E0B;
+  --warn-lt:    #FEF3C7;
+  --info:       #3B82F6;
+  --info-lt:    #EFF6FF;
+  --radius:     16px;
+  --radius-sm:  10px;
+  --shadow:     0 1px 4px rgba(30,10,0,0.07), 0 4px 16px rgba(30,10,0,0.05);
+  --shadow-lg:  0 4px 8px rgba(30,10,0,0.06), 0 12px 32px rgba(30,10,0,0.08);
+  --sidebar-w:  240px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ═══════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 200;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.logo-icon {
+  width: 38px; height: 38px;
+  background: var(--accent);
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(238,77,45,0.35);
+}
+.logo-icon svg { width: 22px; height: 22px; }
+.logo-text strong {
+  display: block;
+  font-size: 15px; font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+.logo-text span {
+  font-size: 10px; font-weight: 500;
+  color: var(--text3);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.sidebar-section {
+  padding: 16px 12px 8px;
+}
+.sidebar-section-label {
+  font-size: 10px; font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin-bottom: 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 13.5px; font-weight: 600;
+  color: var(--text2);
+  transition: all 0.15s;
+  text-decoration: none;
+  margin-bottom: 2px;
+}
+.nav-item:hover { background: var(--accent-lt); color: var(--accent); }
+.nav-item.active { background: var(--accent-lt); color: var(--accent); }
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 16px 12px;
+  border-top: 1px solid var(--border);
+}
+.sync-info {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  text-align: center;
+}
+.sync-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--ok);
+  margin-right: 5px;
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* ═══════════════════════════════════
+   MAIN
+═══════════════════════════════════ */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0; z-index: 100;
+  gap: 12px;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.menu-btn {
+  display: none;
+  background: none; border: none;
+  cursor: pointer; padding: 6px;
+  border-radius: 8px;
+  color: var(--text2);
+}
+.menu-btn:hover { background: var(--accent-lt); color: var(--accent); }
+.menu-btn svg { width: 22px; height: 22px; display: block; }
+
+.page-title {
+  font-size: 18px; font-weight: 800;
+  letter-spacing: -0.4px;
+  color: var(--text);
+}
+.page-sub {
+  font-size: 12px; color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  margin-top: 1px;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.filter-group {
+  display: flex; gap: 6px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+}
+.filter-btn {
+  border: none; background: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px; font-weight: 600;
+  color: var(--text2);
+  padding: 5px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.filter-btn.active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(238,77,45,0.3);
+}
+.filter-btn:hover:not(.active) { background: var(--accent-lt); color: var(--accent); }
+
+.btn-refresh {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px; font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-refresh:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+.btn-refresh svg { width: 14px; height: 14px; }
+
+/* CONTEÚDO */
+.content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+/* KPI CARDS */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 18px 18px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.kpi-card.orange::before { background: var(--accent); }
+.kpi-card.green::before  { background: var(--ok); }
+.kpi-card.amber::before  { background: var(--warn); }
+.kpi-card.blue::before   { background: var(--info); }
+
+.kpi-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.kpi-icon {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.kpi-icon svg { width: 20px; height: 20px; }
+.kpi-card.orange .kpi-icon { background: var(--accent-lt); }
+.kpi-card.orange .kpi-icon svg { stroke: var(--accent); }
+.kpi-card.green  .kpi-icon { background: var(--ok-lt); }
+.kpi-card.green  .kpi-icon svg { stroke: var(--ok); }
+.kpi-card.amber  .kpi-icon { background: var(--warn-lt); }
+.kpi-card.amber  .kpi-icon svg { stroke: var(--warn); }
+.kpi-card.blue   .kpi-icon { background: var(--info-lt); }
+.kpi-card.blue   .kpi-icon svg { stroke: var(--info); }
+
+.kpi-delta {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-family: 'DM Mono', monospace;
+}
+.delta-up   { background: #FFE8E5; color: var(--accent); }
+.delta-down { background: var(--ok-lt); color: var(--ok); }
+.delta-neutral { background: var(--warn-lt); color: var(--warn); }
+
+.kpi-value {
+  font-size: 32px; font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.kpi-label {
+  font-size: 12px; font-weight: 500;
+  color: var(--text3);
+  line-height: 1.3;
+}
+
+/* CHARTS GRID */
+.charts-row {
+  display: grid;
+  gap: 14px;
+}
+.charts-row.two-col { grid-template-columns: 1fr 1fr; }
+.charts-row.three-col { grid-template-columns: 2fr 1fr; }
+
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 20px 18px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: box-shadow 0.2s;
+}
+.chart-card:hover { box-shadow: var(--shadow-lg); }
+
+.chart-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.chart-title {
+  font-size: 14px; font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+.chart-sub {
+  font-size: 11px; color: var(--text3);
+  margin-top: 2px;
+  font-family: 'DM Mono', monospace;
+}
+.chart-tag {
+  font-size: 10px; font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--accent-lt);
+  color: var(--accent);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.chart-wrap {
+  position: relative;
+  flex: 1;
+}
+.chart-wrap canvas { width: 100% !important; }
+
+/* TABELA */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.table-header {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.table-title {
+  font-size: 14px; font-weight: 700;
+  color: var(--text);
+}
+.table-sub {
+  font-size: 11px; color: var(--text3);
+  font-family: 'DM Mono', monospace;
+  margin-top: 1px;
+}
+.search-input {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px 8px 34px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  width: 200px;
+  transition: border-color 0.2s, width 0.3s;
+  position: relative;
+}
+.search-input:focus { border-color: var(--accent); background: #fff; width: 240px; }
+.search-wrap { position: relative; }
+.search-wrap svg {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%);
+  width: 15px; height: 15px;
+  stroke: var(--text3); pointer-events: none;
+}
+
+.table-scroll { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+thead th {
+  background: var(--bg);
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 10.5px; font-weight: 700;
+  color: var(--text3);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td {
+  padding: 12px 16px;
+  color: var(--text);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.td-name { font-weight: 600; }
+.td-re {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; color: var(--text3);
+}
+.td-plate {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; font-weight: 500;
+  background: var(--bg);
+  padding: 4px 8px !important;
+  border-radius: 6px;
+  display: inline-block;
+}
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+.badge-found    { background: #FFE8E5; color: var(--accent); }
+.badge-notfound { background: var(--ok-lt); color: var(--ok); }
+.badge-cabine   { background: var(--warn-lt); color: #92400E; }
+.badge-bau      { background: var(--info-lt); color: #1E40AF; }
+.td-obs {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text2);
+  font-size: 12px;
+}
+
+.table-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.table-count {
+  font-size: 12px; color: var(--text3);
+  font-family: 'DM Mono', monospace;
+}
+.pagination { display: flex; gap: 4px; }
+.page-btn {
+  width: 30px; height: 30px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface);
+  font-size: 12px; font-weight: 600;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.page-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-lt); }
+.page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* TOP VIGILANTES */
+.rank-list { display: flex; flex-direction: column; gap: 10px; }
+.rank-item {
+  display: flex; align-items: center; gap: 12px;
+}
+.rank-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--accent-lt);
+  color: var(--accent);
+  font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.rank-num.gold   { background: #FEF3C7; color: #92400E; }
+.rank-num.silver { background: #F1F5F9; color: #475569; }
+.rank-num.bronze { background: #FFF7ED; color: #9A3412; }
+.rank-info { flex: 1; min-width: 0; }
+.rank-name { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-re   { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.rank-bar-wrap { flex: 1; }
+.rank-bar-bg { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.rank-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; transition: width 1s ease; }
+.rank-count { font-size: 13px; font-weight: 700; color: var(--text); min-width: 24px; text-align: right; }
+
+/* OVERLAY MOBILE */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 190;
+  backdrop-filter: blur(2px);
+}
+
+/* ═══════════════════════════════════
+   RESPONSIVO
+═══════════════════════════════════ */
+@media (max-width: 1100px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .charts-row.three-col { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  :root { --sidebar-w: 240px; }
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); box-shadow: var(--shadow-lg); }
+  .sidebar-overlay.open { display: block; }
+  .main { margin-left: 0; }
+  .menu-btn { display: flex; }
+  .topbar { padding: 0 16px; height: 58px; }
+  .content { padding: 16px; gap: 14px; }
+  .charts-row.two-col { grid-template-columns: 1fr; }
+  .filter-group { display: none; }
+}
+
+@media (max-width: 600px) {
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi-value { font-size: 26px; }
+  .kpi-card { padding: 15px 14px 13px; }
+  .content { padding: 12px; gap: 12px; }
+  .chart-card { padding: 16px 14px 14px; }
+  .search-input { width: 140px; }
+  .search-input:focus { width: 160px; }
+  .page-title { font-size: 15px; }
+  tbody td { padding: 10px 12px; }
+  thead th { padding: 8px 12px; }
+  .btn-refresh span { display: none; }
+}
+
+@media (max-width: 380px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- Overlay mobile -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <path d="M16 10a4 4 0 01-8 0"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <strong>Shopee</strong>
+      <span>Prev. de Perdas</span>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <div class="sidebar-section-label">Menu</div>
+    <a class="nav-item active" href="#">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+      Visão geral
+    </a>
+    <a class="nav-item" href="#" onclick="scrollToSection('sec-ocorrencias')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+      </svg>
+      Ocorrências
+      <span class="nav-badge" id="nb-total">0</span>
+    </a>
+    <a class="nav-item" href="#" onclick="scrollToSection('sec-pacotes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+      Pacotes
+    </a>
+    <a class="nav-item" href="#" onclick="scrollToSection('sec-veiculos')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="3" width="15" height="13" rx="2"/>
+        <path d="M16 8h4l3 5v4h-7V8z"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+      Veículos
+    </a>
+    <a class="nav-item" href="#" onclick="scrollToSection('sec-vigilantes')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+      </svg>
+      Vigilantes
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="sync-info">
+      <span class="sync-dot"></span>
+      Dados em tempo real
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-btn" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub" id="topbar-date">Carregando...</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="filter-group">
+        <button class="filter-btn active" onclick="setFilter('7d', this)">7 dias</button>
+        <button class="filter-btn" onclick="setFilter('30d', this)">30 dias</button>
+        <button class="filter-btn" onclick="setFilter('all', this)">Tudo</button>
+      </div>
+      <button class="btn-refresh" onclick="loadData()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
+        </svg>
+        <span>Atualizar</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <div class="content">
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card orange">
+        <div class="kpi-header">
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <span class="kpi-delta delta-up" id="delta-total">+0%</span>
+        </div>
+        <div class="kpi-value" id="kpi-total">0</div>
+        <div class="kpi-label">Total de ocorrências</div>
+      </div>
+
+      <div class="kpi-card orange">
+        <div class="kpi-header">
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/>
+            </svg>
+          </div>
+          <span class="kpi-delta delta-up" id="delta-pacotes">+0%</span>
+        </div>
+        <div class="kpi-value" id="kpi-pacotes">0</div>
+        <div class="kpi-label">Pacotes encontrados</div>
+      </div>
+
+      <div class="kpi-card green">
+        <div class="kpi-header">
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="1" y="3" width="15" height="13" rx="2"/>
+              <path d="M16 8h4l3 5v4h-7V8z"/>
+              <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+          </div>
+          <span class="kpi-delta delta-neutral" id="delta-veiculos">0</span>
+        </div>
+        <div class="kpi-value" id="kpi-veiculos">0</div>
+        <div class="kpi-label">Veículos vistoriados</div>
+      </div>
+
+      <div class="kpi-card blue">
+        <div class="kpi-header">
+          <div class="kpi-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87"/>
+              <path d="M16 3.13a4 4 0 010 7.75"/>
+            </svg>
+          </div>
+          <span class="kpi-delta delta-neutral" id="delta-vigilantes">0</span>
+        </div>
+        <div class="kpi-value" id="kpi-vigilantes">0</div>
+        <div class="kpi-label">Vigilantes ativos</div>
+      </div>
+    </div>
+
+    <!-- GRÁFICOS LINHA + PIZZA -->
+    <div class="charts-row two-col" id="sec-ocorrencias">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Ocorrências por dia</div>
+            <div class="chart-sub">Evolução temporal</div>
+          </div>
+          <span class="chart-tag">Linha</span>
+        </div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="chartLinha"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card" id="sec-pacotes">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Pacotes encontrados</div>
+            <div class="chart-sub">Cabine vs Baú</div>
+          </div>
+          <span class="chart-tag">Pizza</span>
+        </div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="chartPizza"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO BARRAS + RANKING -->
+    <div class="charts-row two-col" id="sec-veiculos">
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Ocorrências por período do dia</div>
+            <div class="chart-sub">Distribuição por turno</div>
+          </div>
+          <span class="chart-tag">Barras</span>
+        </div>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="chartBarras"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card" id="sec-vigilantes">
+        <div class="chart-header">
+          <div>
+            <div class="chart-title">Top vigilantes</div>
+            <div class="chart-sub">Por nº de registros</div>
+          </div>
+          <span class="chart-tag">Ranking</span>
+        </div>
+        <div class="rank-list" id="rankList"></div>
+      </div>
+    </div>
+
+    <!-- TABELA -->
+    <div class="table-card">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Registros recentes</div>
+          <div class="table-sub" id="table-count-label">Carregando...</div>
+        </div>
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input class="search-input" type="text" placeholder="Buscar..." id="searchInput" oninput="filterTable()">
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Data / hora</th>
+              <th>Nome</th>
+              <th>RE</th>
+              <th>Placa</th>
+              <th>Pacote</th>
+              <th>Local</th>
+              <th>BR / NF</th>
+              <th>Observações</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <div class="table-count" id="table-showing"></div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<script>
+// ─── CONFIGURAÇÃO ─────────────────────────────────────────
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/shopee.com/s/AKfycbxpYpULOOj9yqab2zuCSxmPhEhupmoKBWZfFNGHelMpIrU-mrdvrJSkum5_oAAN97O6/exec';
+// ──────────────────────────────────────────────────────────
+
+// Estado global
+let allData    = [];
+let filtered   = [];
+let currentFilter = '7d';
+let currentPage   = 1;
+const PER_PAGE    = 10;
+
+// Relógio topbar
+function updateClock() {
+  const now = new Date();
+  const p = n => String(n).padStart(2,'0');
+  document.getElementById('topbar-date').textContent =
+    `${p(now.getDate())}/${p(now.getMonth()+1)}/${now.getFullYear()} · ${p(now.getHours())}:${p(now.getMinutes())}`;
+}
+updateClock(); setInterval(updateClock, 30000);
+
+// Sidebar mobile
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+function scrollToSection(id) {
+  closeSidebar();
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// Filtro de período
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilter();
+}
+
+function applyFilter() {
+  const now = new Date();
+  filtered = allData.filter(row => {
+    if (currentFilter === 'all') return true;
+    const dt = parseDate(row[0]);
+    if (!dt) return true;
+    const diff = (now - dt) / 86400000;
+    return currentFilter === '7d' ? diff <= 7 : diff <= 30;
+  });
+  currentPage = 1;
+  renderAll();
+}
+
+function parseDate(str) {
+  if (!str) return null;
+  const [datePart, timePart] = str.split(' ');
+  if (!datePart) return null;
+  const [d, m, y] = datePart.split('/');
+  return new Date(`${y}-${m}-${d}T${timePart || '00:00:00'}`);
+}
+
+// ─── CARREGAR DADOS ──────────────────────────────────────
+async function loadData() {
+  try {
+    const resp = await fetch(APPS_SCRIPT_URL + '?action=get');
+    const json = await resp.json();
+    allData = json.data || [];
+  } catch(e) {
+    // Dados de demonstração caso não haja Apps Script configurado
+    allData = gerarDadosDemo();
+  }
+  applyFilter();
+}
+
+function gerarDadosDemo() {
+  const nomes = [
+    ['Carlos Silva','10234'], ['Ana Souza','20891'], ['João Lima','30045'],
+    ['Maria Oliveira','40123'], ['Pedro Santos','50678'],
+    ['Fernanda Costa','60345'], ['Lucas Mendes','70912']
+  ];
+  const placas = ['ABC1D23','XYZ9H87','DEF4E56','GHI7F34','JKL2G90','MNO5A12'];
+  const obs    = ['Sem observações','Motorista colaborou','Documento verificado','Pacote lacrado','Nota fiscal conferida',''];
+  const rows = [];
+  for (let i = 0; i < 48; i++) {
+    const dt = new Date(Date.now() - Math.random() * 25 * 86400000);
+    const p  = n => String(n).padStart(2,'0');
+    const dataHora = `${p(dt.getDate())}/${p(dt.getMonth()+1)}/${dt.getFullYear()} ${p(dt.getHours())}:${p(dt.getMinutes())}:00`;
+    const [nome, re]  = nomes[Math.floor(Math.random() * nomes.length)];
+    const placa       = placas[Math.floor(Math.random() * placas.length)];
+    const pacote      = Math.random() > 0.55 ? 'Sim' : 'Não';
+    const local       = pacote === 'Sim' ? (Math.random() > 0.5 ? 'Cabine' : 'Baú') : '';
+    const br          = pacote === 'Sim' ? String(Math.floor(Math.random() * 9000000 + 1000000)) : '';
+    const ob          = obs[Math.floor(Math.random() * obs.length)];
+    rows.push([dataHora, nome, re, placa, pacote, local, br, ob]);
+  }
+  return rows.sort((a, b) => (parseDate(b[0]) || 0) - (parseDate(a[0]) || 0));
+}
+
+// ─── RENDER ──────────────────────────────────────────────
+function renderAll() {
+  renderKPIs();
+  renderChartLinha();
+  renderChartPizza();
+  renderChartBarras();
+  renderRanking();
+  renderTable();
+}
+
+// KPIs
+function renderKPIs() {
+  const total     = filtered.length;
+  const pacotes   = filtered.filter(r => r[4] === 'Sim').length;
+  const veiculos  = new Set(filtered.map(r => r[3]).filter(Boolean)).size;
+  const vigils    = new Set(filtered.map(r => r[2]).filter(Boolean)).size;
+
+  animCount('kpi-total',      total);
+  animCount('kpi-pacotes',    pacotes);
+  animCount('kpi-veiculos',   veiculos);
+  animCount('kpi-vigilantes', vigils);
+
+  document.getElementById('nb-total').textContent = total;
+  document.getElementById('delta-veiculos').textContent   = veiculos + ' únicos';
+  document.getElementById('delta-vigilantes').textContent = vigils + ' ativos';
+
+  const pct = total > 0 ? Math.round(pacotes / total * 100) : 0;
+  document.getElementById('delta-total').textContent   = pct + '% c/ pacote';
+  document.getElementById('delta-pacotes').textContent = pct + '%';
+}
+
+function animCount(id, target) {
+  const el = document.getElementById(id);
+  const start = parseInt(el.textContent) || 0;
+  const dur = 600, step = 16;
+  let cur = start, elapsed = 0;
+  const timer = setInterval(() => {
+    elapsed += step;
+    cur = Math.round(start + (target - start) * (elapsed / dur));
+    el.textContent = cur;
+    if (elapsed >= dur) { el.textContent = target; clearInterval(timer); }
+  }, step);
+}
+
+// Gráfico de linha
+let chartLinha, chartPizza, chartBarras;
+
+function renderChartLinha() {
+  const map = {};
+  filtered.forEach(r => {
+    const dt = parseDate(r[0]);
+    if (!dt) return;
+    const key = `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}`;
+    map[key] = (map[key] || 0) + 1;
+  });
+  const sorted = Object.entries(map).sort((a,b) => {
+    const [da, ma] = a[0].split('/').map(Number);
+    const [db, mb] = b[0].split('/').map(Number);
+    return (ma*100+da) - (mb*100+db);
+  }).slice(-14);
+  const labels = sorted.map(x => x[0]);
+  const data   = sorted.map(x => x[1]);
+
+  if (chartLinha) chartLinha.destroy();
+  chartLinha = new Chart(document.getElementById('chartLinha'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Ocorrências',
+        data,
+        borderColor: '#EE4D2D',
+        backgroundColor: 'rgba(238,77,45,0.08)',
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#EE4D2D',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: '#EDE0D9' }, ticks: { font: { family: 'DM Mono', size: 10 }, color: '#A8938A' } },
+        y: { grid: { color: '#EDE0D9' }, ticks: { font: { family: 'DM Mono', size: 10 }, color: '#A8938A' }, beginAtZero: true, precision: 0 }
+      }
+    }
+  });
+}
+
+function renderChartPizza() {
+  const cabine = filtered.filter(r => r[5] === 'Cabine').length;
+  const bau    = filtered.filter(r => r[5] === 'Baú').length;
+  const nenhum = filtered.filter(r => r[4] === 'Não').length;
+
+  if (chartPizza) chartPizza.destroy();
+  chartPizza = new Chart(document.getElementById('chartPizza'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Cabine', 'Baú', 'Não encontrado'],
+      datasets: [{
+        data: [cabine, bau, nenhum],
+        backgroundColor: ['#EE4D2D', '#FF7337', '#F0D5C8'],
+        borderColor: '#fff',
+        borderWidth: 3,
+        hoverOffset: 6,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }, color: '#6B5347', padding: 14, usePointStyle: true, pointStyleWidth: 8 }
+        }
+      }
+    }
+  });
+}
+
+function renderChartBarras() {
+  const turnos = { 'Madrugada (0-6h)': 0, 'Manhã (6-12h)': 0, 'Tarde (12-18h)': 0, 'Noite (18-24h)': 0 };
+  filtered.forEach(r => {
+    const dt = parseDate(r[0]);
+    if (!dt) return;
+    const h = dt.getHours();
+    if (h < 6) turnos['Madrugada (0-6h)']++;
+    else if (h < 12) turnos['Manhã (6-12h)']++;
+    else if (h < 18) turnos['Tarde (12-18h)']++;
+    else turnos['Noite (18-24h)']++;
+  });
+
+  if (chartBarras) chartBarras.destroy();
+  chartBarras = new Chart(document.getElementById('chartBarras'), {
+    type: 'bar',
+    data: {
+      labels: Object.keys(turnos).map(l => l.split(' ')[0]),
+      datasets: [{
+        label: 'Ocorrências',
+        data: Object.values(turnos),
+        backgroundColor: ['rgba(238,77,45,0.15)','rgba(238,77,45,0.4)','rgba(238,77,45,0.7)','rgba(238,77,45,0.9)'],
+        borderColor: '#EE4D2D',
+        borderWidth: 1.5,
+        borderRadius: 7,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'Plus Jakarta Sans', size: 11, weight: '600' }, color: '#6B5347' } },
+        y: { grid: { color: '#EDE0D9' }, ticks: { font: { family: 'DM Mono', size: 10 }, color: '#A8938A' }, beginAtZero: true, precision: 0 }
+      }
+    }
+  });
+}
+
+function renderRanking() {
+  const map = {};
+  filtered.forEach(r => {
+    const key = r[2] || 'Desconhecido';
+    if (!map[key]) map[key] = { nome: r[1] || key, re: key, count: 0 };
+    map[key].count++;
+  });
+  const sorted = Object.values(map).sort((a,b) => b.count - a.count).slice(0, 5);
+  const max = sorted[0]?.count || 1;
+
+  const medals = ['gold','silver','bronze','',''];
+  const container = document.getElementById('rankList');
+  container.innerHTML = sorted.map((v, i) => `
+    <div class="rank-item">
+      <div class="rank-num ${medals[i]}">${i+1}</div>
+      <div class="rank-info">
+        <div class="rank-name">${v.nome}</div>
+        <div class="rank-re">RE ${v.re}</div>
+      </div>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar-bg">
+          <div class="rank-bar-fill" style="width:${Math.round(v.count/max*100)}%"></div>
+        </div>
+      </div>
+      <div class="rank-count">${v.count}</div>
+    </div>
+  `).join('');
+}
+
+// Tabela
+let tableData = [];
+
+function renderTable() {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  tableData = filtered.filter(r =>
+    !q || r.some(cell => String(cell).toLowerCase().includes(q))
+  );
+  document.getElementById('table-count-label').textContent =
+    `${tableData.length} registro${tableData.length !== 1 ? 's' : ''}`;
+
+  const totalPages = Math.max(1, Math.ceil(tableData.length / PER_PAGE));
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * PER_PAGE;
+  const page  = tableData.slice(start, start + PER_PAGE);
+
+  const body = document.getElementById('tableBody');
+  body.innerHTML = page.map(r => {
+    const [dataHora, nome, re, placa, pacote, local, br, obs] = r;
+    const badgePacote = pacote === 'Sim'
+      ? '<span class="badge badge-found">Sim</span>'
+      : '<span class="badge badge-notfound">Não</span>';
+    const badgeLocal = local === 'Cabine'
+      ? '<span class="badge badge-cabine">Cabine</span>'
+      : local === 'Baú'
+      ? '<span class="badge badge-bau">Baú</span>'
+      : '—';
+    return `<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11.5px;color:var(--text2)">${dataHora || '—'}</td>
+      <td class="td-name">${nome || '—'}</td>
+      <td class="td-re">${re || '—'}</td>
+      <td><span class="td-plate">${placa || '—'}</span></td>
+      <td>${badgePacote}</td>
+      <td>${badgeLocal}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px">${br || '—'}</td>
+      <td class="td-obs" title="${obs || ''}">${obs || '—'}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('table-showing').textContent =
+    `Mostrando ${start+1}–${Math.min(start+PER_PAGE, tableData.length)} de ${tableData.length}`;
+
+  // Paginação
+  const pag = document.getElementById('pagination');
+  pag.innerHTML = '';
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
+    btn.textContent = i;
+    btn.onclick = () => { currentPage = i; renderTable(); };
+    pag.appendChild(btn);
+  }
+}
+
+function filterTable() {
+  currentPage = 1;
+  renderTable();
+}
+
+// Init
+loadData();
+setInterval(loadData, 60000);
+</script>
+</body>
+</html>

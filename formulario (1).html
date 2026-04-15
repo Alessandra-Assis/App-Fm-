@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Ocorrência · Shopee</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #FFF6F0;
+    --surface:   #FFFFFF;
+    --surface2:  #FFF0E8;
+    --border:    #F0D5C8;
+    --border-focus: #EE4D2D;
+    --accent:    #EE4D2D;
+    --accent-dk: #C73E24;
+    --accent-lt: #FFEEE9;
+    --accent2:   #FF7337;
+    --ok:        #1AA563;
+    --danger:    #E53935;
+    --text:      #1A1A1A;
+    --text2:     #6B5E5A;
+    --text3:     #B09890;
+    --radius:    14px;
+    --radius-sm: 10px;
+    --shadow:    0 2px 12px rgba(238,77,45,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--accent);
+    padding: 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(238,77,45,0.3);
+  }
+  .header-inner {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 14px 0 12px;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .logo-box {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .logo-box svg { width: 19px; height: 19px; }
+  .header-titles h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+    line-height: 1.2;
+  }
+  .header-titles p {
+    font-size: 10px;
+    color: rgba(255,255,255,0.75);
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 1px;
+    margin-top: 1px;
+  }
+  #datetime-display {
+    font-size: 11.5px;
+    color: rgba(255,255,255,0.95);
+    font-family: 'DM Mono', monospace;
+    background: rgba(0,0,0,0.15);
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── FORM ── */
+  .form-container {
+    padding: 18px 14px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 15px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .card-title::before {
+    content: '';
+    width: 3px; height: 13px;
+    background: var(--accent);
+    border-radius: 2px;
+    display: block;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    margin-bottom: 5px;
+  }
+  label .req { color: var(--accent); margin-left: 1px; }
+
+  /* Nome + RE na mesma linha */
+  .nome-re-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .nome-re-row .field-nome { flex: 1; margin-bottom: 0; }
+  .nome-re-row .field-re   { width: 130px; margin-bottom: 0; flex-shrink: 0; }
+
+  .re-wrap {
+    display: flex;
+    align-items: stretch;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .re-wrap:focus-within {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(238,77,45,0.1);
+  }
+  .re-badge {
+    background: var(--accent-lt);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 0 10px;
+    display: flex; align-items: center;
+    border-right: 1.5px solid var(--border);
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+  }
+  .re-wrap input {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--bg);
+    flex: 1;
+    min-width: 0;
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+  .re-wrap input:focus { background: #fff; outline: none; box-shadow: none !important; }
+
+  input[type="text"],
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    padding: 12px 13px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  input::placeholder, textarea::placeholder { color: var(--text3); font-size: 13.5px; }
+  input:focus, textarea:focus {
+    border-color: var(--border-focus);
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(238,77,45,0.1);
+  }
+  textarea { resize: none; min-height: 88px; line-height: 1.55; }
+
+  /* Radio */
+  .radio-group { display: flex; gap: 8px; }
+  .radio-option { flex: 1; }
+  .radio-option input { display: none; }
+  .radio-option label {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 8px;
+    cursor: pointer;
+    font-size: 14px; font-weight: 600;
+    color: var(--text2);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .radio-option input:checked + label {
+    border-color: var(--accent);
+    background: var(--accent-lt);
+    color: var(--accent);
+  }
+  .radio-option label:active { transform: scale(0.97); }
+  .dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--text3);
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .radio-option input:checked + label .dot {
+    border-color: var(--accent); background: var(--accent);
+  }
+  .radio-option input:checked + label .dot::after {
+    content: ''; width: 5px; height: 5px;
+    border-radius: 50%; background: #fff; display: block;
+  }
+
+  /* Condicional */
+  .conditional {
+    overflow: hidden; max-height: 0; opacity: 0;
+    transition: max-height 0.35s ease, opacity 0.25s ease, margin 0.25s;
+  }
+  .conditional.visible { max-height: 700px; opacity: 1; margin-top: 12px; }
+  .conditional-inner {
+    background: var(--accent-lt);
+    border: 1.5px solid #F5C4B5;
+    border-left: 4px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 16px 14px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  /* Foto */
+  .foto-area {
+    background: #fff;
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-sm);
+    padding: 18px 14px; text-align: center;
+    cursor: pointer; position: relative;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .foto-area:hover { border-color: var(--accent); background: var(--accent-lt); }
+  .foto-area input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    width: 100%; height: 100%; padding: 0; border: none; background: none;
+  }
+  .foto-cam {
+    width: 38px; height: 38px;
+    background: var(--accent-lt); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 8px;
+  }
+  .foto-cam svg { width: 20px; height: 20px; }
+  .foto-text { font-size: 13px; color: var(--text2); font-weight: 600; }
+  .foto-sub  { font-size: 11px; color: var(--text3); margin-top: 3px; }
+  #preview-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .preview-item { position: relative; width: 72px; height: 72px; }
+  .preview-item img {
+    width: 100%; height: 100%; object-fit: cover;
+    border-radius: 8px; border: 2px solid var(--accent);
+  }
+  .preview-remove {
+    position: absolute; top: -6px; right: -6px;
+    width: 20px; height: 20px; background: var(--danger);
+    border-radius: 50%; border: none; color: #fff; font-size: 11px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Botão */
+  .btn-submit {
+    width: 100%; background: var(--accent); color: #fff; border: none;
+    border-radius: var(--radius);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px; font-weight: 700; padding: 16px;
+    cursor: pointer; letter-spacing: 0.2px;
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 16px rgba(238,77,45,0.35);
+    margin-top: 4px;
+  }
+  .btn-submit:hover { background: var(--accent-dk); }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #fff; border: 1.5px solid var(--border);
+    border-radius: 50px; padding: 11px 22px;
+    font-size: 13px; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+    transition: transform 0.3s cubic-bezier(.34,1.56,.64,1), opacity 0.3s;
+    opacity: 0; z-index: 999; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { border-color: var(--ok); color: var(--ok); }
+  .toast.error   { border-color: var(--danger); color: var(--danger); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+      </div>
+      <div class="header-titles">
+        <h1>Registro de Ocorrência</h1>
+        <p>SHOPEE · PREVENÇÃO DE PERDAS</p>
+      </div>
+    </div>
+    <div id="datetime-display">--/--/---- · --:--:--</div>
+  </div>
+</div>
+
+<div class="form-container">
+  <form id="ocorrencia-form" novalidate>
+
+    <!-- IDENTIFICAÇÃO -->
+    <div class="card">
+      <div class="card-title">Identificação</div>
+      <div class="nome-re-row">
+        <div class="field-nome">
+          <label for="nome">Nome completo <span class="req">*</span></label>
+          <input type="text" id="nome" name="nome" placeholder="Nome do vigilante" autocomplete="name" required>
+        </div>
+        <div class="field-re">
+          <label for="re">RE <span class="req">*</span></label>
+          <div class="re-wrap">
+            <span class="re-badge">RE</span>
+            <input type="text" id="re" name="re" placeholder="0012345" required>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VEÍCULO -->
+    <div class="card">
+      <div class="card-title">Veículo</div>
+      <div class="field">
+        <label for="placa">Placa do veículo <span class="req">*</span></label>
+        <input type="text" id="placa" name="placa" placeholder="Ex: ABC-1234 ou ABC1D23" maxlength="8" required>
+      </div>
+    </div>
+
+    <!-- OCORRÊNCIA -->
+    <div class="card">
+      <div class="card-title">Ocorrência</div>
+
+      <div class="field">
+        <label>Foi encontrado pacote? <span class="req">*</span></label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" name="pacote_encontrado" id="pacote_sim" value="Sim" required>
+            <label for="pacote_sim"><span class="dot"></span> Sim</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" name="pacote_encontrado" id="pacote_nao" value="Não">
+            <label for="pacote_nao"><span class="dot"></span> Não</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="conditional" id="bloco_pacote">
+        <div class="conditional-inner">
+
+          <div class="field" style="margin-bottom:0">
+            <label>Local encontrado <span class="req">*</span></label>
+            <div class="radio-group">
+              <div class="radio-option">
+                <input type="radio" name="local_pacote" id="loc_cabine" value="Cabine">
+                <label for="loc_cabine"><span class="dot"></span> Cabine</label>
+              </div>
+              <div class="radio-option">
+                <input type="radio" name="local_pacote" id="loc_bau" value="Baú">
+                <label for="loc_bau"><span class="dot"></span> Baú</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="field" style="margin-bottom:0">
+            <label for="numero_br">Número da BR / Nota Fiscal <span class="req">*</span></label>
+            <input type="text" id="numero_br" name="numero_br" placeholder="Ex: 000123456">
+          </div>
+
+          <div class="field" style="margin-bottom:0">
+            <label>Fotos do pacote</label>
+            <div class="foto-area">
+              <input type="file" id="fotos" name="fotos" accept="image/*" multiple capture="environment">
+              <div class="foto-cam">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#EE4D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
+              <div class="foto-text">Toque para fotografar ou selecionar</div>
+              <div class="foto-sub">Até 3 fotos · JPG ou PNG</div>
+            </div>
+            <div id="preview-container"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- OBSERVAÇÕES -->
+    <div class="card">
+      <div class="card-title">Observações</div>
+      <div class="field">
+        <label for="observacoes">Detalhes adicionais</label>
+        <textarea id="observacoes" name="observacoes" placeholder="Descreva quaisquer informações relevantes sobre a ocorrência..."></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="btn-submit">Registrar Ocorrência</button>
+
+  </form>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── CONFIGURAÇÃO ───────────────────────────────────────
+  const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/shopee.com/s/AKfycbxpYpULOOj9yqab2zuCSxmPhEhupmoKBWZfFNGHelMpIrU-mrdvrJSkum5_oAAN97O6/exec';
+  // ────────────────────────────────────────────────────────
+
+  // Relógio automático
+  function updateDateTime() {
+    const now = new Date();
+    const p = n => String(n).padStart(2,'0');
+    document.getElementById('datetime-display').textContent =
+      `${p(now.getDate())}/${p(now.getMonth()+1)}/${now.getFullYear()} · ${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+  }
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+
+  // Placa maiúscula
+  document.getElementById('placa').addEventListener('input', function() {
+    this.value = this.value.toUpperCase();
+  });
+
+  // Condicional pacote
+  document.querySelectorAll('input[name="pacote_encontrado"]').forEach(r => {
+    r.addEventListener('change', function() {
+      const bloco = document.getElementById('bloco_pacote');
+      if (this.value === 'Sim') {
+        bloco.classList.add('visible');
+      } else {
+        bloco.classList.remove('visible');
+        document.querySelectorAll('input[name="local_pacote"]').forEach(x => x.checked = false);
+        document.getElementById('numero_br').value = '';
+        limparFotos();
+      }
+    });
+  });
+
+  // Fotos
+  let fotosBase64 = [];
+  document.getElementById('fotos').addEventListener('change', function(e) {
+    const files = Array.from(e.target.files).slice(0, 3);
+    fotosBase64 = [];
+    const container = document.getElementById('preview-container');
+    container.innerHTML = '';
+    files.forEach((file, i) => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        fotosBase64.push({ nome: file.name, dados: ev.target.result });
+        const item = document.createElement('div');
+        item.className = 'preview-item';
+        item.innerHTML = `<img src="${ev.target.result}" alt="Foto ${i+1}">
+          <button class="preview-remove" type="button" data-i="${i}">✕</button>`;
+        item.querySelector('.preview-remove').addEventListener('click', function() {
+          fotosBase64.splice(parseInt(this.dataset.i), 1);
+          item.remove();
+        });
+        container.appendChild(item);
+      };
+      reader.readAsDataURL(file);
+    });
+  });
+
+  function limparFotos() {
+    fotosBase64 = [];
+    document.getElementById('preview-container').innerHTML = '';
+    document.getElementById('fotos').value = '';
+  }
+
+  // Toast
+  function showToast(msg, tipo = '') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${tipo} show`;
+    setTimeout(() => t.className = 'toast', 3500);
+  }
+
+  // Validação
+  function validar() {
+    const nome  = document.getElementById('nome').value.trim();
+    const re    = document.getElementById('re').value.trim();
+    const placa = document.getElementById('placa').value.trim();
+    const pacote = document.querySelector('input[name="pacote_encontrado"]:checked');
+    if (!nome)   { showToast('Preencha o nome.', 'error'); return false; }
+    if (!re)     { showToast('Preencha o RE.', 'error'); return false; }
+    if (!placa)  { showToast('Preencha a placa do veículo.', 'error'); return false; }
+    if (!pacote) { showToast('Informe se foi encontrado pacote.', 'error'); return false; }
+    if (pacote.value === 'Sim') {
+      if (!document.querySelector('input[name="local_pacote"]:checked'))
+        { showToast('Informe onde o pacote foi encontrado.', 'error'); return false; }
+      if (!document.getElementById('numero_br').value.trim())
+        { showToast('Informe o número da BR / NF.', 'error'); return false; }
+    }
+    return true;
+  }
+
+  // Submit
+  document.getElementById('ocorrencia-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!validar()) return;
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Enviando…';
+
+    const now = new Date();
+    const p = n => String(n).padStart(2,'0');
+    const dataHora = `${p(now.getDate())}/${p(now.getMonth()+1)}/${now.getFullYear()} ${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+
+    const payload = {
+      dataHora,
+      nome:             document.getElementById('nome').value.trim(),
+      re:               document.getElementById('re').value.trim(),
+      placa:            document.getElementById('placa').value.trim(),
+      pacoteEncontrado: document.querySelector('input[name="pacote_encontrado"]:checked')?.value || '',
+      localPacote:      document.querySelector('input[name="local_pacote"]:checked')?.value || '',
+      numeroBR:         document.getElementById('numero_br').value.trim(),
+      observacoes:      document.getElementById('observacoes').value.trim(),
+      fotos:            fotosBase64
+    };
+
+    try {
+      const resp = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+      const result = await resp.json();
+      if (result.status === 'ok') {
+        showToast('✓ Ocorrência registrada com sucesso!', 'success');
+        this.reset();
+        document.getElementById('bloco_pacote').classList.remove('visible');
+        document.querySelectorAll('input[name="pacote_encontrado"]').forEach(r => r.checked = false);
+        limparFotos();
+      } else {
+        throw new Error(result.message || 'Erro desconhecido');
+      }
+    } catch(err) {
+      showToast('Erro ao enviar. Tente novamente.', 'error');
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Registrar Ocorrência';
+    }
+  });
+</script>
+</body>
+</html>
