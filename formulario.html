@@ -567,8 +567,17 @@
     };
 
     try {
-      const resp = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
-      const result = await resp.json();
+      const url = new URL(APPS_SCRIPT_URL);
+
+// adiciona todos os campos
+      Object.keys(payload).forEach(key => {
+      if (key !== 'fotos') { // ignorar fotos no GET
+      url.searchParams.append(key, payload[key] || '');
+      }
+      });
+
+          const resp = await fetch(url);
+          const result = await resp.json();
       if (result.status === 'ok') {
         showToast('✓ Ocorrência registrada com sucesso!', 'success');
         this.reset();
