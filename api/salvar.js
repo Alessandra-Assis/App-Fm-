@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch('SUA_URL_DO_APPS_SCRIPT', {
+    const response = await fetch('https://script.google.com/a/macros/shopee.com/s/AKfycbxpYpULOOj9yqab2zuCSxmPhEhupmoKBWZfFNGHelMpIrU-mrdvrJSkum5_oAAN97O6/exec', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
